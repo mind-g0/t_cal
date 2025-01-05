@@ -3,34 +3,45 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>حاسبة طيف الملية للمبيعات </title>
+    <title>حاسبة طيف الملية للمبيعات</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            margin: 20px;
+            margin: 0;
             padding: 0;
             background-color: #f4f4f4;
         }
         .container {
-            max-width: 800px;
+            max-width: 100%;
             margin: 0 auto;
             background: #fff;
             padding: 20px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             border-radius: 8px;
+            box-sizing: border-box;
         }
         h1 {
             text-align: center;
+            font-size: 24px;
+            margin-bottom: 20px;
         }
         form {
             margin-bottom: 20px;
         }
+        .input-label {
+            font-weight: bold;
+            margin-top: 10px;
+            display: block;
+            margin-bottom: 5px;
+        }
         input {
-            width: calc(100% - 20px);
+            width: 100%;
             padding: 10px;
             margin: 10px 0;
             border: 1px solid #ccc;
             border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 16px;
         }
         button {
             width: 100%;
@@ -40,6 +51,7 @@
             border: none;
             border-radius: 4px;
             cursor: pointer;
+            font-size: 16px;
         }
         button:hover {
             background: #218838;
@@ -49,14 +61,25 @@
             padding: 10px;
             background: #e9ecef;
             border-radius: 4px;
+            font-size: 14px;
         }
         canvas {
             margin-top: 20px;
+            width: 100% !important;
         }
-        .input-label {
-            font-weight: bold;
-            margin-top: 10px;
-            margin-left: 550px;
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 20px;
+            }
+            .input-label {
+                font-size: 14px;
+            }
+            input, button {
+                font-size: 14px;
+            }
+            #results {
+                font-size: 12px;
+            }
         }
     </style>
 </head>
@@ -70,7 +93,7 @@
             <label class="input-label" for="productsSold">عدد المنتجات التي تم بيعها كل شهر</label>
             <input type="number" id="productsSold" placeholder="Enter products sold per month" required />
 
-            <label class="input-label" for="expenses">المصاريف الشهرية للمنجات</label>
+            <label class="input-label" for="expenses">المصاريف الشهرية للمنتجات</label>
             <input type="number" id="expenses" placeholder="Enter project expenses" required />
 
             <label class="input-label" for="investment">رأس المال</label>
@@ -139,16 +162,13 @@
             displayTotalCollection.textContent = totalCollection.toFixed(2);
             displayWillReachBEP.textContent = willReachBEP ? 'Yes' : 'No';
 
-
             setTimeout(() => {
-    if (willReachBEP === true) {
-        alert("سوف تصل الى نقطة التعادل في الوقت المحدد");
-    } else {
-        alert("لن تصل الى نقطة التعادل في الوقت المحدد");
-    }
-}, 2000); // 3000 milliseconds = 3 seconds
-
-            
+                if (willReachBEP === true) {
+                    alert("سوف تصل الى نقطة التعادل في الوقت المحدد");
+                } else {
+                    alert("لن تصل الى نقطة التعادل في الوقت المحدد");
+                }
+            }, 2000);
 
             // Update chart
             if (financeChart) {
@@ -187,11 +207,8 @@
                         }
                     }
                 }
-                
             });
-            
         });
-        
     </script>
 </body>
 </html>
