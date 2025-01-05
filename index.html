@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>حاسبة طيف الملية للمبيعات </title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+        h1 {
+            text-align: center;
+        }
+        form {
+            margin-bottom: 20px;
+        }
+        input {
+            width: calc(100% - 20px);
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            background: #28a745;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #218838;
+        }
+        #results {
+            margin-top: 20px;
+            padding: 10px;
+            background: #e9ecef;
+            border-radius: 4px;
+        }
+        canvas {
+            margin-top: 20px;
+        }
+        .input-label {
+            font-weight: bold;
+            margin-top: 10px;
+            margin-left: 550px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>حاسبة طيف الملية للمبيعات</h1>
+        <form id="financeForm">
+            <label class="input-label" for="pricePerProduct">ادخل سعر المنتج الكلي الجاهز للبيع</label>
+            <input type="number" id="pricePerProduct" placeholder="Enter price per product" required />
+
+            <label class="input-label" for="productsSold">عدد المنتجات التي تم بيعها كل شهر</label>
+            <input type="number" id="productsSold" placeholder="Enter products sold per month" required />
+
+            <label class="input-label" for="expenses">المصاريف الشهرية للمنجات</label>
+            <input type="number" id="expenses" placeholder="Enter project expenses" required />
+
+            <label class="input-label" for="investment">رأس المال</label>
+            <input type="number" id="investment" placeholder="Enter total investment" required />
+
+            <label class="input-label" for="timePeriod">الوقت المتوقع لبداية الحصول على ربح حقيقي</label>
+            <input type="number" id="timePeriod" placeholder="Enter time period (in months)" required />
+           
+            <button type="submit">Calculate</button>
+        </form>
+        <div id="results">
+            <p><strong>Monthly Income:</strong> <span id="displayIncome">0</span></p>
+            <p><strong>Expenses:</strong> <span id="displayExpenses">0</span></p>
+            <p><strong>Balance:</strong> <span id="displayBalance">0</span></p>
+            <p><strong>ROI (%):</strong> <span id="displayROI">0</span></p>
+            <p style="font-size: large;"><strong>Break-Even Point</strong> (الوقت المتوقع اذا تم تعديه سوف تبداء بتحصيل الارباح):<span id="displayBEP">0</span></p>
+            <p><strong>Total Collection in Time Period:</strong> <span id="displayTotalCollection">0</span></p>
+            <p><strong>Will Reach BEP in Time Period:</strong> <span id="displayWillReachBEP">No</span></p>
+        </div>
+        <canvas id="financeChart" width="400" height="200"></canvas>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        const form = document.getElementById('financeForm');
+        const displayIncome = document.getElementById('displayIncome');
+        const displayExpenses = document.getElementById('displayExpenses');
+        const displayBalance = document.getElementById('displayBalance');
+        const displayROI = document.getElementById('displayROI');
+        const displayBEP = document.getElementById('displayBEP');
+        const displayTotalCollection = document.getElementById('displayTotalCollection');
+        const displayWillReachBEP = document.getElementById('displayWillReachBEP');
+        const ctx = document.getElementById('financeChart').getContext('2d');
+
+        let financeChart;
+
+        form.addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            // Get user inputs
+            const pricePerProduct = parseFloat(document.getElementById('pricePerProduct').value);
+            const productsSold = parseFloat(document.getElementById('productsSold').value);
+            const expenses = parseFloat(document.getElementById('expenses').value);
+            const investment = parseFloat(document.getElementById('investment').value);
+            const timePeriod = parseFloat(document.getElementById('timePeriod').value);
+
+            const monthlyIncome = pricePerProduct * productsSold;
+            const balance = monthlyIncome - expenses;
+
+            // Calculate ROI and Break-Even Point
+            const roi = ((balance / investment) * 100).toFixed(2);
+            const breakEvenPoint = investment / balance;
+
+            // Calculate total collection in the given time period
+            const totalCollection = monthlyIncome * timePeriod;
+
+            // Check if BEP can be reached in the given time period
+            const willReachBEP = (balance * timePeriod) >= investment;
+
+            // Update results
+            displayIncome.textContent = monthlyIncome.toFixed(2);
+            displayExpenses.textContent = expenses.toFixed(2);
+            displayBalance.textContent = balance.toFixed(2);
+            displayROI.textContent = roi;
+            displayBEP.textContent = breakEvenPoint.toFixed(2);
+            displayTotalCollection.textContent = totalCollection.toFixed(2);
+            displayWillReachBEP.textContent = willReachBEP ? 'Yes' : 'No';
+
+
+            setTimeout(() => {
+    if (willReachBEP === true) {
+        alert("سوف تصل الى نقطة التعادل في الوقت المحدد");
+    } else {
+        alert("لن تصل الى نقطة التعادل في الوقت المحدد");
+    }
+}, 2000); // 3000 milliseconds = 3 seconds
+
+            
+
+            // Update chart
+            if (financeChart) {
+                financeChart.destroy();
+            }
+
+            financeChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Monthly Income', 'Expenses', 'Balance', 'ROI (%)', 'Total Collection'],
+                    datasets: [{
+                        label: 'Financial Overview',
+                        data: [monthlyIncome, expenses, balance, roi, totalCollection],
+                        backgroundColor: [
+                            'rgba(75, 192, 192, 0.6)',
+                            'rgba(255, 99, 132, 0.6)',
+                            'rgba(54, 162, 235, 0.6)',
+                            'rgba(153, 102, 255, 0.6)',
+                            'rgba(255, 206, 86, 0.6)'
+                        ],
+                        borderColor: [
+                            'rgba(75, 192, 192, 1)',
+                            'rgba(255, 99, 132, 1)',
+                            'rgba(54, 162, 235, 1)',
+                            'rgba(153, 102, 255, 1)',
+                            'rgba(255, 206, 86, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+                
+            });
+            
+        });
+        
+    </script>
+</body>
+</html>
